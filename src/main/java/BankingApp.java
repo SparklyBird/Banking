@@ -6,17 +6,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BankingApp extends JFrame {
-    private Connection conn;
-    private JTextField usernameField, passwordField, balanceField, amountField, recipientField;
+    Connection conn;
+    JTextField usernameField;
+    JTextField passwordField;
+    JTextField balanceField;
+    JTextField amountField;
+    private JTextField recipientField;
     private JLabel statusLabel;
-    private String loggedInUser;
-    private DecimalFormat decimalFormat;
+    String loggedInUser;
+    private final DecimalFormat decimalFormat;
 
     public BankingApp() {
-        decimalFormat = new DecimalFormat("#,###.##");
+        decimalFormat = new DecimalFormat("#,###.00");
         setupDatabase();
         createLoginUI();
     }
+
 
     private void setupDatabase() {
         try {
@@ -63,7 +68,7 @@ public class BankingApp extends JFrame {
         setVisible(true);
     }
 
-    private void login() {
+    void login() {
         String username = usernameField.getText();
         String password = new String(((JPasswordField) passwordField).getPassword());
 
@@ -87,7 +92,7 @@ public class BankingApp extends JFrame {
         }
     }
 
-    private void register() {
+    void register() {
         String username = usernameField.getText();
         String password = new String(((JPasswordField) passwordField).getPassword());
 
@@ -162,7 +167,7 @@ public class BankingApp extends JFrame {
         repaint();
     }
 
-    private void deposit() {
+    void deposit() {
         try {
             double amount = parseAmount(amountField.getText());
             if (amount > 0) {
@@ -176,7 +181,7 @@ public class BankingApp extends JFrame {
         }
     }
 
-    private void withdraw() {
+    void withdraw() {
         try {
             double amount = parseAmount(amountField.getText());
             double currentBalance = parseAmount(balanceField.getText());
@@ -185,12 +190,15 @@ public class BankingApp extends JFrame {
                 updateBalance(-amount);
                 showMessage("Withdrawal successful!");
             } else {
+                // Reformat the balance to ensure it's consistent with the expected format
+                balanceField.setText(decimalFormat.format(currentBalance));
                 showMessage("Invalid withdrawal amount or insufficient funds.");
             }
         } catch (NumberFormatException e) {
             showMessage("Error parsing withdrawal amount: " + e.getMessage());
         }
     }
+
 
     private void sendMoney() {
         try {
@@ -314,8 +322,6 @@ public class BankingApp extends JFrame {
             return balance;
         }
     }
-
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(BankingApp::new);
